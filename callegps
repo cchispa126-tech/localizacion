@@ -3,151 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Localizador GPS y Dirección</title>
+    <title>GPS Móvil</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #1a237e, #4a148c);
-            color: #fff;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
             min-height: 100vh;
             padding: 20px;
             display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 500px;
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            max-width: 450px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            margin-top: 20px;
-        }
-        
-        header {
             text-align: center;
-            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
         
         h1 {
             font-size: 1.8rem;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-        }
-        
-        h1 i {
-            color: #4fc3f7;
+            gap: 15px;
+            color: #fff;
         }
         
         .subtitle {
-            color: #bbbbbb;
-            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.5;
         }
         
-        .status-card {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
+        .status-box {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
             padding: 20px;
             margin-bottom: 25px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 80px;
         }
         
-        .status-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: #4fc3f7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        #status {
+        .status-text {
             font-size: 1rem;
-            padding: 10px;
-            border-radius: 10px;
-            background-color: rgba(0, 0, 0, 0.3);
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-weight: 500;
         }
         
-        .info-card {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
+        .data-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
+            text-align: left;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .info-title {
+        .section-title {
+            color: #bbdefb;
             font-size: 1.2rem;
             margin-bottom: 15px;
-            color: #4fc3f7;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .info-content {
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            min-height: 60px;
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .data-label {
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .data-value {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-weight: 600;
+            color: white;
+            text-align: right;
+            max-width: 60%;
             word-break: break-word;
-        }
-        
-        .coordinates {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .coordinate-item {
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .coordinate-label {
-            font-size: 0.9rem;
-            color: #bbbbbb;
-            margin-bottom: 5px;
-        }
-        
-        .coordinate-value {
-            font-size: 1.1rem;
-            font-weight: bold;
         }
         
         .button-container {
             display: flex;
             flex-direction: column;
             gap: 15px;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
         
-        button {
-            padding: 16px;
+        .btn {
+            background: linear-gradient(135deg, #2962ff 0%, #2979ff 100%);
+            color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
+            padding: 18px;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
@@ -156,44 +138,83 @@
             justify-content: center;
             gap: 12px;
             transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(41, 98, 255, 0.3);
+            width: 100%;
         }
         
-        #getLocationBtn {
-            background: linear-gradient(to right, #4fc3f7, #2979ff);
-            color: white;
-        }
-        
-        #getLocationBtn:hover {
-            background: linear-gradient(to right, #29b6f6, #1565c0);
+        .btn:hover, .btn:active {
+            background: linear-gradient(135deg, #1e56e0 0%, #1c6fe8 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(41, 182, 246, 0.4);
+            box-shadow: 0 8px 25px rgba(41, 98, 255, 0.4);
         }
         
-        #resetBtn {
-            background-color: rgba(255, 255, 255, 0.1);
+        .btn:disabled {
+            background: #78909c;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
+            box-shadow: 0 6px 20px rgba(0, 200, 83, 0.3);
+        }
+        
+        .btn-secondary:hover, .btn-secondary:active {
+            background: linear-gradient(135deg, #00b248 0%, #00d46a 100%);
+            box-shadow: 0 8px 25px rgba(0, 200, 83, 0.4);
+        }
+        
+        .map-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
             color: white;
+            padding: 16px 24px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
         }
         
-        #resetBtn:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+        .map-link:hover, .map-link:active {
+            background: rgba(255, 255, 255, 0.25);
         }
         
         .loading {
             display: none;
-            text-align: center;
-            margin: 15px 0;
         }
         
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #4fc3f7;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+        .loading.active {
+            display: inline-block;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .permission-help {
+            background: rgba(255, 193, 7, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            display: none;
+        }
+        
+        .permission-help.show {
+            display: block;
+        }
+        
+        .permission-help h4 {
+            color: #ffd54f;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         @keyframes spin {
@@ -201,293 +222,377 @@
             100% { transform: rotate(360deg); }
         }
         
-        .error {
-            color: #ff8a80;
-            background-color: rgba(255, 138, 128, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .success {
-            color: #69f0ae;
-            background-color: rgba(105, 240, 174, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .accuracy {
-            font-size: 0.9rem;
-            color: #bbbbbb;
-            margin-top: 10px;
-            text-align: center;
-        }
-        
-        footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #bbbbbb;
-            width: 100%;
-            max-width: 500px;
-        }
-        
         @media (max-width: 480px) {
+            body {
+                padding: 15px;
+                align-items: flex-start;
+                padding-top: 40px;
+            }
+            
             .container {
                 padding: 20px;
+                max-width: 100%;
             }
             
             h1 {
                 font-size: 1.5rem;
             }
             
-            .coordinates {
-                grid-template-columns: 1fr;
+            .btn {
+                padding: 16px;
+                font-size: 1rem;
             }
+        }
+        
+        /* Mejoras táctiles para móvil */
+        .btn {
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
+            touch-action: manipulation;
+        }
+        
+        /* Estados táctiles */
+        .btn:active {
+            transform: scale(0.98);
+            transition: transform 0.1s;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1><i class="fas fa-map-marker-alt"></i> Localizador GPS</h1>
-        <p class="subtitle">Obtén tu posición exacta y dirección actual</p>
-    </header>
-    
     <div class="container">
-        <div class="status-card">
-            <div class="status-title">
-                <i class="fas fa-satellite"></i> Estado de localización
+        <h1><i class="fas fa-map-marker-alt"></i> GPS Móvil</h1>
+        <p class="subtitle">Obtén tu ubicación exacta y dirección en tu dispositivo móvil</p>
+        
+        <div class="status-box">
+            <i class="fas fa-sync-alt loading" id="loading-icon"></i>
+            <span id="status-text" class="status-text">Presiona el botón para comenzar</span>
+        </div>
+        
+        <div class="data-section">
+            <div class="section-title"><i class="fas fa-satellite"></i> Coordenadas GPS</div>
+            <div class="data-row">
+                <span class="data-label">Latitud:</span>
+                <span id="latitude" class="data-value">--</span>
             </div>
-            <div id="status">
-                Esperando para obtener ubicación...
+            <div class="data-row">
+                <span class="data-label">Longitud:</span>
+                <span id="longitude" class="data-value">--</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Precisión:</span>
+                <span id="accuracy" class="data-value">--</span>
             </div>
         </div>
         
-        <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <p>Obteniendo ubicación...</p>
-        </div>
-        
-        <div class="error" id="error"></div>
-        <div class="success" id="success"></div>
-        
-        <div class="info-card">
-            <div class="info-title">
-                <i class="fas fa-map-pin"></i> Coordenadas GPS
-            </div>
-            <div class="coordinates">
-                <div class="coordinate-item">
-                    <div class="coordinate-label">Latitud</div>
-                    <div class="coordinate-value" id="latitude">--</div>
+        <div class="data-section">
+            <div class="section-title"><i class="fas fa-map-marked-alt"></i> Dirección</div>
+            <div id="address">
+                <div class="data-row">
+                    <span class="data-label">Calle:</span>
+                    <span id="street" class="data-value">--</span>
                 </div>
-                <div class="coordinate-item">
-                    <div class="coordinate-label">Longitud</div>
-                    <div class="coordinate-value" id="longitude">--</div>
+                <div class="data-row">
+                    <span class="data-label">Ciudad:</span>
+                    <span id="city" class="data-value">--</span>
                 </div>
-            </div>
-            <div id="accuracy" class="accuracy"></div>
-        </div>
-        
-        <div class="info-card">
-            <div class="info-title">
-                <i class="fas fa-road"></i> Dirección
-            </div>
-            <div class="info-content" id="address">
-                La dirección aparecerá aquí después de obtener la ubicación.
+                <div class="data-row">
+                    <span class="data-label">País:</span>
+                    <span id="country" class="data-value">--</span>
+                </div>
             </div>
         </div>
         
         <div class="button-container">
-            <button id="getLocationBtn">
-                <i class="fas fa-location-crosshairs"></i> Obtener Mi Ubicación
+            <button id="getLocationBtn" class="btn">
+                <i class="fas fa-location-crosshairs" id="location-icon"></i>
+                Obtener Mi Ubicación
             </button>
-            <button id="resetBtn">
-                <i class="fas fa-redo"></i> Reiniciar
+            
+            <button id="watchLocationBtn" class="btn btn-secondary">
+                <i class="fas fa-satellite-dish" id="watch-icon"></i>
+                <span id="watch-text">Seguir en Tiempo Real</span>
             </button>
         </div>
+        
+        <a id="mapLink" class="map-link" href="#" target="_blank" style="display: none;">
+            <i class="fas fa-map"></i>
+            Ver en Google Maps
+        </a>
+        
+        <div id="permission-help" class="permission-help">
+            <h4><i class="fas fa-exclamation-triangle"></i> ¿Problemas con la ubicación?</h4>
+            <p>1. Asegúrate de que el GPS esté activado en tu dispositivo</p>
+            <p>2. Permite el acceso a la ubicación cuando el navegador lo solicite</p>
+            <p>3. Si usas iOS, verifica Configuración > Privacidad > Ubicación</p>
+        </div>
     </div>
-    
-    <footer>
-        <p>Esta aplicación utiliza la API de Geolocalización y OpenStreetMap para obtener direcciones.</p>
-        <p>© 2023 Localizador GPS - Para uso educativo</p>
-    </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Elementos del DOM
-            const statusElement = document.getElementById('status');
-            const latitudeElement = document.getElementById('latitude');
-            const longitudeElement = document.getElementById('longitude');
-            const addressElement = document.getElementById('address');
-            const getLocationBtn = document.getElementById('getLocationBtn');
-            const resetBtn = document.getElementById('resetBtn');
-            const loadingElement = document.getElementById('loading');
-            const errorElement = document.getElementById('error');
-            const successElement = document.getElementById('success');
-            const accuracyElement = document.getElementById('accuracy');
+        // Detectar si es móvil
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Elementos del DOM
+        const statusText = document.getElementById('status-text');
+        const latitudeElement = document.getElementById('latitude');
+        const longitudeElement = document.getElementById('longitude');
+        const accuracyElement = document.getElementById('accuracy');
+        const streetElement = document.getElementById('street');
+        const cityElement = document.getElementById('city');
+        const countryElement = document.getElementById('country');
+        const getLocationBtn = document.getElementById('getLocationBtn');
+        const watchLocationBtn = document.getElementById('watchLocationBtn');
+        const mapLink = document.getElementById('mapLink');
+        const loadingIcon = document.getElementById('loading-icon');
+        const locationIcon = document.getElementById('location-icon');
+        const watchIcon = document.getElementById('watch-icon');
+        const watchText = document.getElementById('watch-text');
+        const permissionHelp = document.getElementById('permission-help');
+        
+        // Variables de control
+        let watchId = null;
+        let isWatching = false;
+        let lastPosition = null;
+        
+        // Mostrar ayuda para permisos en móviles
+        if (isMobile) {
+            setTimeout(() => {
+                permissionHelp.classList.add('show');
+            }, 3000);
+        }
+        
+        // Actualizar estado
+        function updateStatus(message, isError = false, isLoading = false) {
+            statusText.textContent = message;
             
-            // Variables para almacenar la ubicación
-            let currentPosition = null;
-            let watchId = null;
-            
-            // Evento para obtener ubicación
-            getLocationBtn.addEventListener('click', getLocation);
-            
-            // Evento para reiniciar
-            resetBtn.addEventListener('click', resetLocation);
-            
-            // Función para obtener la ubicación
-            function getLocation() {
-                // Mostrar estado de carga
-                loadingElement.style.display = 'block';
-                errorElement.style.display = 'none';
-                successElement.style.display = 'none';
-                statusElement.textContent = 'Obteniendo ubicación...';
+            if (isLoading) {
+                loadingIcon.classList.add('active');
+                statusText.style.color = '#bbdefb';
+            } else {
+                loadingIcon.classList.remove('active');
                 
-                // Verificar si el navegador soporta geolocalización
+                if (isError) {
+                    statusText.style.color = '#ff8a80';
+                    permissionHelp.classList.add('show');
+                } else {
+                    statusText.style.color = '#c8e6c9';
+                    permissionHelp.classList.remove('show');
+                }
+            }
+        }
+        
+        // Función simplificada para obtener dirección
+        async function getAddress(lat, lon) {
+            try {
+                // Usamos una API más simple y confiable
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Error en la API');
+                }
+                
+                const data = await response.json();
+                
+                if (data && data.address) {
+                    const addr = data.address;
+                    
+                    streetElement.textContent = addr.road || addr.pedestrian || '--';
+                    cityElement.textContent = addr.city || addr.town || addr.village || '--';
+                    countryElement.textContent = addr.country || '--';
+                    
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.log('Error obteniendo dirección:', error);
+                
+                // Si falla, mostramos coordenadas como dirección
+                streetElement.textContent = `Lat: ${lat.toFixed(6)}`;
+                cityElement.textContent = `Lon: ${lon.toFixed(6)}`;
+                countryElement.textContent = 'Usa Google Maps para dirección';
+                
+                return false;
+            }
+        }
+        
+        // Función principal para actualizar ubicación
+        async function updateLocation(position) {
+            const coords = position.coords;
+            lastPosition = position;
+            
+            // Actualizar coordenadas
+            latitudeElement.textContent = coords.latitude.toFixed(6);
+            longitudeElement.textContent = coords.longitude.toFixed(6);
+            accuracyElement.textContent = coords.accuracy ? `${Math.round(coords.accuracy)} m` : '--';
+            
+            // Obtener dirección
+            updateStatus('Obteniendo dirección...', false, true);
+            await getAddress(coords.latitude, coords.longitude);
+            
+            // Actualizar enlace a Google Maps
+            mapLink.href = `https://maps.google.com/?q=${coords.latitude},${coords.longitude}`;
+            mapLink.style.display = 'flex';
+            
+            // Actualizar estado
+            updateStatus(isWatching ? 'Ubicación actualizada' : 'Ubicación obtenida');
+            
+            // Restaurar botones
+            getLocationBtn.disabled = false;
+            watchLocationBtn.disabled = false;
+            locationIcon.className = 'fas fa-location-crosshairs';
+        }
+        
+        // Manejar errores específicos para móviles
+        function handleLocationError(error) {
+            let errorMessage = 'Error desconocido';
+            
+            switch(error.code) {
+                case 1: // PERMISSION_DENIED
+                    errorMessage = 'Permiso denegado. En móvil, toca "Permitir" cuando el navegador lo solicite.';
+                    break;
+                case 2: // POSITION_UNAVAILABLE
+                    errorMessage = 'Ubicación no disponible. Activa el GPS en tu dispositivo.';
+                    break;
+                case 3: // TIMEOUT
+                    errorMessage = 'Tiempo agotado. Asegúrate de tener buena señal.';
+                    break;
+            }
+            
+            updateStatus(errorMessage, true);
+            permissionHelp.classList.add('show');
+            
+            // Restaurar botones
+            getLocationBtn.disabled = false;
+            watchLocationBtn.disabled = false;
+            locationIcon.className = 'fas fa-location-crosshairs';
+            
+            if (isWatching) {
+                watchIcon.className = 'fas fa-satellite-dish';
+                watchText.textContent = 'Seguir en Tiempo Real';
+                isWatching = false;
+            }
+        }
+        
+        // Obtener ubicación (versión mejorada para móviles)
+        function getLocation() {
+            updateStatus(isMobile ? 'Solicitando permiso de ubicación...' : 'Obteniendo ubicación...', false, true);
+            
+            getLocationBtn.disabled = true;
+            watchLocationBtn.disabled = true;
+            locationIcon.className = 'fas fa-spinner fa-spin';
+            
+            if (!navigator.geolocation) {
+                updateStatus('Tu navegador no soporta geolocalización', true);
+                return;
+            }
+            
+            // Opciones específicas para móviles
+            const options = {
+                enableHighAccuracy: true,
+                timeout: isMobile ? 20000 : 15000, // Más tiempo en móviles
+                maximumAge: 0
+            };
+            
+            navigator.geolocation.getCurrentPosition(
+                updateLocation,
+                handleLocationError,
+                options
+            );
+        }
+        
+        // Alternar seguimiento
+        function toggleWatchLocation() {
+            if (!isWatching) {
+                // Iniciar seguimiento
+                updateStatus('Iniciando seguimiento...', false, true);
+                getLocationBtn.disabled = true;
+                watchIcon.className = 'fas fa-spinner fa-spin';
+                
                 if (!navigator.geolocation) {
-                    showError("Tu navegador no soporta la geolocalización.");
-                    loadingElement.style.display = 'none';
+                    updateStatus('Geolocalización no disponible', true);
                     return;
                 }
                 
-                // Opciones para la geolocalización
                 const options = {
                     enableHighAccuracy: true,
-                    timeout: 10000,
+                    timeout: 15000,
                     maximumAge: 0
                 };
                 
-                // Intentar obtener la ubicación actual
-                navigator.geolocation.getCurrentPosition(
-                    // Éxito
-                    function(position) {
-                        loadingElement.style.display = 'none';
-                        currentPosition = position;
-                        updatePositionInfo(position);
-                        getAddressFromCoordinates(position.coords.latitude, position.coords.longitude);
-                        showSuccess("Ubicación obtenida correctamente.");
-                        
-                        // Iniciar seguimiento de posición
-                        if (watchId) {
-                            navigator.geolocation.clearWatch(watchId);
-                        }
-                        
-                        watchId = navigator.geolocation.watchPosition(
-                            updatePositionInfo,
-                            showError,
-                            options
-                        );
-                    },
-                    // Error
-                    function(error) {
-                        loadingElement.style.display = 'none';
-                        let errorMessage = "Error al obtener la ubicación: ";
-                        
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED:
-                                errorMessage += "Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.";
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                errorMessage += "La información de ubicación no está disponible.";
-                                break;
-                            case error.TIMEOUT:
-                                errorMessage += "La solicitud de ubicación ha expirado.";
-                                break;
-                            default:
-                                errorMessage += "Error desconocido.";
-                        }
-                        
-                        showError(errorMessage);
-                    },
+                watchId = navigator.geolocation.watchPosition(
+                    updateLocation,
+                    handleLocationError,
                     options
                 );
-            }
-            
-            // Función para actualizar la información de posición
-            function updatePositionInfo(position) {
-                const coords = position.coords;
                 
-                // Actualizar coordenadas
-                latitudeElement.textContent = coords.latitude.toFixed(6);
-                longitudeElement.textContent = coords.longitude.toFixed(6);
-                
-                // Actualizar precisión
-                accuracyElement.textContent = `Precisión: ${coords.accuracy ? Math.round(coords.accuracy) : 'N/A'} metros`;
-                
-                // Actualizar estado
-                statusElement.textContent = 'Ubicación obtenida correctamente';
-                statusElement.style.color = '#69f0ae';
-                
-                // Actualizar posición actual
-                currentPosition = position;
-            }
-            
-            // Función para obtener dirección a partir de coordenadas
-            async function getAddressFromCoordinates(lat, lon) {
-                try {
-                    addressElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo dirección...';
-                    
-                    // Usar Nominatim (OpenStreetMap) para geocodificación inversa
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
-                    );
-                    
-                    if (!response.ok) {
-                        throw new Error('Error al obtener la dirección');
-                    }
-                    
-                    const data = await response.json();
-                    
-                    if (data && data.display_name) {
-                        addressElement.textContent = data.display_name;
-                    } else {
-                        addressElement.textContent = "Dirección no disponible";
-                    }
-                } catch (error) {
-                    console.error("Error al obtener dirección:", error);
-                    addressElement.textContent = "No se pudo obtener la dirección. Verifica tu conexión a internet.";
-                }
-            }
-            
-            // Función para mostrar errores
-            function showError(message) {
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-                statusElement.textContent = 'Error al obtener ubicación';
-                statusElement.style.color = '#ff8a80';
-            }
-            
-            // Función para mostrar éxito
-            function showSuccess(message) {
-                successElement.textContent = message;
-                successElement.style.display = 'block';
-            }
-            
-            // Función para reiniciar la ubicación
-            function resetLocation() {
-                if (watchId) {
+                isWatching = true;
+                watchText.textContent = 'Detener Seguimiento';
+                watchIcon.className = 'fas fa-stop-circle';
+                updateStatus('Seguimiento activo');
+            } else {
+                // Detener seguimiento
+                if (watchId !== null) {
                     navigator.geolocation.clearWatch(watchId);
                     watchId = null;
                 }
                 
-                currentPosition = null;
-                latitudeElement.textContent = '--';
-                longitudeElement.textContent = '--';
-                addressElement.textContent = 'La dirección aparecerá aquí después de obtener la ubicación.';
-                statusElement.textContent = 'Esperando para obtener ubicación...';
-                statusElement.style.color = '#ffffff';
-                errorElement.style.display = 'none';
-                successElement.style.display = 'none';
-                accuracyElement.textContent = '';
-                loadingElement.style.display = 'none';
+                isWatching = false;
+                watchText.textContent = 'Seguir en Tiempo Real';
+                watchIcon.className = 'fas fa-satellite-dish';
+                updateStatus('Seguimiento detenido');
+                getLocationBtn.disabled = false;
             }
-            
-            // Intento automático de obtener ubicación al cargar la página
-            getLocation();
+        }
+        
+        // Intentar detectar automáticamente en móviles (solo una vez)
+        if (isMobile) {
+            setTimeout(() => {
+                updateStatus('En móvil: Toca "Obtener Mi Ubicación" para comenzar');
+            }, 1000);
+        }
+        
+        // Event Listeners optimizados para móvil
+        getLocationBtn.addEventListener('click', getLocation);
+        getLocationBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            this.style.transform = 'scale(0.98)';
+        });
+        getLocationBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            this.style.transform = '';
+        });
+        
+        watchLocationBtn.addEventListener('click', toggleWatchLocation);
+        watchLocationBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            this.style.transform = 'scale(0.98)';
+        });
+        watchLocationBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            this.style.transform = '';
+        });
+        
+        // Intentar obtener ubicación automáticamente si ya hay permisos
+        window.addEventListener('load', function() {
+            if (isMobile) {
+                updateStatus('Listo para obtener ubicación en tu móvil');
+            } else {
+                updateStatus('Presiona el botón para obtener tu ubicación');
+            }
+        });
+        
+        // Manejar cambios en la visibilidad de la página (útil para móviles)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && isWatching) {
+                updateStatus('Aplicación en segundo plano - seguimiento activo');
+            }
+        });
+        
+        // Limpiar al salir
+        window.addEventListener('beforeunload', function() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+            }
         });
     </script>
 </body>
