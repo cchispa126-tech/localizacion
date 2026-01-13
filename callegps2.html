@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS con Voz - StreetAnnouncer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        h1:before {
+            content: "🗺️";
+            font-size: 1.2em;
+        }
+        
+        .subtitle {
+            color: #a8edea;
+            font-size: 1.2em;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .panel h2 {
+            color: #a8edea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* INFO PANEL */
+        .location-display {
+            margin-top: 20px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #26d0ce;
+        }
+        
+        .info-label {
+            color: #a8edea;
+            font-weight: bold;
+        }
+        
+        .info-value {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .current-street {
+            background: linear-gradient(135deg, #26d0ce, #1a2980);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            animation: streetGlow 2s infinite alternate;
+        }
+        
+        @keyframes streetGlow {
+            from { box-shadow: 0 5px 20px rgba(38, 208, 206, 0.3); }
+            to { box-shadow: 0 5px 30px rgba(38, 208, 206, 0.6); }
+        }
+        
+        .street-label {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+        
+        .street-name {
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+        }
+        
+        /* CONTROLS PANEL */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .control-group {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .control-label {
+            flex: 1;
+            color: #a8edea;
+        }
+        
+        .slider-container {
+            flex: 2;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #26d0ce;
+            cursor: pointer;
+            border: 3px solid white;
+        }
+        
+        .value-display {
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #26d0ce, #1a2980);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-red {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        }
+        
+        .btn-green {
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+        }
+        
+        .btn-yellow {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+        }
+        
+        /* LOG PANEL */
+        .log-container {
+            margin-top: 30px;
+        }
+        
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .log-entries {
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .log-entry {
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #26d0ce;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .log-time {
+            font-size: 0.8em;
+            color: #a8edea;
+            margin-bottom: 5px;
+        }
+        
+        .log-message {
+            font-size: 0.95em;
+        }
+        
+        .log-entry.voice {
+            border-left-color: #00b09b;
+            background: rgba(0, 176, 155, 0.1);
+        }
+        
+        .log-entry.warning {
+            border-left-color: #f7971e;
+            background: rgba(247, 151, 30, 0.1);
+        }
+        
+        .log-entry.error {
+            border-left-color: #ff416c;
+            background: rgba(255, 65, 108, 0.1);
+        }
+        
+        /* STATUS BAR */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4cd137;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-dot.inactive {
+            background: #e74c3c;
+        }
+        
+        /* FOOTER */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: #a8edea;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>StreetAnnouncer GPS</h1>
+            <p class="subtitle">Tu asistente de navegación con voz - Anuncia cada cambio de calle automáticamente</p>
+        </header>
+        
+        <div class="main-content">
+            <!-- Panel izquierdo: Información de ubicación -->
+            <div class="panel">
+                <h2>📍 INFORMACIÓN DE UBICACIÓN</h2>
+                
+                <div class="location-display">
+                    <div class="info-row">
+                        <span class="info-label">Latitud:</span>
+                        <span class="info-value" id="latitude">Esperando GPS...</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label">Longitud:</span>
+                        <span class="info-value" id="longitude">Esperando GPS...</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label">Precisión:</span>
+                        <span class="info-value" id="accuracy">0 metros</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label">Velocidad:</span>
+                        <span class="info-value" id="speed">0 km/h</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label">Calles anunciadas:</span>
+                        <span class="info-value" id="streetsCount">0</span>
+                    </div>
+                </div>
+                
+                <div class="current-street">
+                    <div class="street-label">CALLE ACTUAL</div>
+                    <div class="street-name" id="currentStreet">Esperando ubicación...</div>
+                </div>
+            </div>
+            
+            <!-- Panel derecho: Controles de voz -->
+            <div class="panel">
+                <h2>🎚️ CONTROLES DE VOZ</h2>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <div class="control-row">
+                            <span class="control-label">🔊 Volumen:</span>
+                            <div class="slider-container">
+                                <input type="range" id="volumeSlider" min="0" max="100" value="80">
+                                <span class="value-display" id="volumeValue">80%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="control-row">
+                            <span class="control-label">🗣️ Velocidad:</span>
+                            <div class="slider-container">
+                                <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1.2">
+                                <span class="value-display" id="speedValue">1.2x</span>
+                            </div>
+                        </div>
+                        
+                        <div class="control-row">
+                            <span class="control-label">📍 Sensibilidad:</span>
+                            <div class="slider-container">
+                                <input type="range" id="sensitivitySlider" min="10" max="100" value="50">
+                                <span class="value-display" id="sensitivityValue">50m</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-green" onclick="startGPS()" id="startBtn">
+                            <span>▶</span> Iniciar GPS
+                        </button>
+                        
+                        <button class="btn btn-red" onclick="stopGPS()" id="stopBtn" disabled>
+                            <span>⏹</span> Detener GPS
+                        </button>
+                        
+                        <button class="btn" onclick="toggleVoice()" id="voiceBtn">
+                            <span>🔊</span> Voz: ON
+                        </button>
+                        
+                        <button class="btn btn-yellow" onclick="testVoice()">
+                            <span>🔊</span> Probar Voz
+                        </button>
+                        
+                        <button class="btn" onclick="repeatAnnouncement()">
+                            <span>🔁</span> Repetir
+                        </button>
+                        
+                        <button class="btn" onclick="clearLog()">
+                            <span>🗑️</span> Limpiar Log
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel de log -->
+        <div class="log-container">
+            <div class="log-header">
+                <h2>📝 HISTORIAL DE NAVEGACIÓN</h2>
+                <span id="logCount">0 eventos</span>
+            </div>
+            
+            <div class="log-entries" id="logEntries">
+                <!-- Las entradas se agregarán aquí -->
+            </div>
+        </div>
+        
+        <!-- Barra de estado -->
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">GPS: Esperando activación</span>
+            </div>
+            
+            <div>
+                <span style="color: #a8edea;">Última actualización: </span>
+                <span id="lastUpdate">--:--:--</span>
+            </div>
+        </div>
+        
+        <footer>
+            <p>StreetAnnouncer GPS v1.0 | Funciona en Chrome, Edge y Firefox | Permite acceso a ubicación cuando lo solicite</p>
+        </footer>
+    </div>
+    
+    <script>
+        // ===== CONFIGURACIÓN INICIAL =====
+        let gpsActive = false;
+        let voiceEnabled = true;
+        let watchId = null;
+        let lastStreet = '';
+        let streetsAnnounced = 0;
+        let logEntries = [];
+        let currentLocation = null;
+        
+        // Calles de ejemplo para simulación/demo
+        const streetNames = [
+            "Avenida Principal", "Calle Mayor", "Paseo Marítimo", 
+            "Carrera de la Virgen", "Ronda de la Luna", "Plaza del Sol",
+            "Camino Real", "Avenida de la Libertad", "Calle del Río",
+            "Paseo de la Castellana", "Gran Vía", "Calle de Alcalá",
+            "Puerta del Sol", "Plaza Mayor", "Calle de Toledo",
+            "Calle de Atocha", "Paseo del Prado", "Calle de Huertas",
+            "Avenida de América", "Calle Princesa", "Plaza de España",
+            "Calle Fuencarral", "Calle Bravo Murillo", "Avenida de Felipe II"
+        ];
+        
+        // ===== INICIALIZAR APLICACIÓN =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+            addLogEntry("Aplicación GPS con voz iniciada", "system");
+        });
+        
+        function initApp() {
+            // Configurar controles deslizantes
+            setupSliders();
+            
+            // Configurar botones
+            updateButtonStates();
+            
+            // Actualizar UI
+            updateUI();
+        }
+        
+        function setupSliders() {
+            // Volumen
+            document.getElementById('volumeSlider').addEventListener('input', function(e) {
+                document.getElementById('volumeValue').textContent = e.target.value + '%';
+            });
+            
+            // Velocidad
+            document.getElementById('speedSlider').addEventListener('input', function(e) {
+                document.getElementById('speedValue').textContent = e.target.value + 'x';
+            });
+            
+            // Sensibilidad
+            document.getElementById('sensitivitySlider').addEventListener('input', function(e) {
+                document.getElementById('sensitivityValue').textContent = e.target.value + 'm';
+            });
+        }
+        
+        // ===== SISTEMA GPS =====
+        function startGPS() {
+            if (gpsActive) return;
+            
+            if (!navigator.geolocation) {
+                addLogEntry("Error: Tu navegador no soporta geolocalización", "error");
+                updateStatus("GPS no soportado", false);
+                return;
+            }
+            
+            updateStatus("Obteniendo ubicación...", false);
+            
+            // Solicitar ubicación actual
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    handleNewPosition(position);
+                    updateStatus("GPS activo - Monitoreando ubicación", true);
+                    
+                    // Comenzar a monitorear cambios
+                    const options = {
+                        enableHighAccuracy: true,
+                        maximumAge: 10000,
+                        timeout: 5000
+                    };
+                    
+                    watchId = navigator.geolocation.watchPosition(
+                        handleNewPosition,
+                        handleGeolocationError,
+                        options
+                    );
+                    
+                    gpsActive = true;
+                    updateButtonStates();
+                    addLogEntry("GPS activado y monitoreando ubicación", "system");
+                    
+                    // Saludo inicial
+                    if (voiceEnabled) {
+                        speak("GPS activado. Monitoreando ubicación.");
+                    }
+                },
+                function(error) {
+                    handleGeolocationError(error);
+                }
+            );
+        }
+        
+        function stopGPS() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            
+            gpsActive = false;
+            updateButtonStates();
+            updateStatus("GPS detenido", false);
+            
+            addLogEntry("GPS detenido", "system");
+            
+            if (voiceEnabled) {
+                speak("GPS detenido");
+            }
+        }
+        
+        function handleNewPosition(position) {
+            currentLocation = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                speed: position.coords.speed || 0,
+                timestamp: new Date(position.timestamp || Date.now())
+            };
+            
+            // Actualizar UI
+            updateLocationUI();
+            
+            // Obtener nombre de calle (simulado)
+            const newStreet = getStreetFromLocation(currentLocation);
+            
+            // Verificar si cambió la calle
+            if (newStreet !== lastStreet) {
+                // Actualizar calle actual
+                lastStreet = newStreet;
+                document.getElementById('currentStreet').textContent = newStreet;
+                
+                // Anunciar por voz si está habilitado
+                if (voiceEnabled && gpsActive) {
+                    announceStreetChange(newStreet);
+                }
+                
+                // Registrar en log
+                addLogEntry(`📍 Nueva calle: ${newStreet}`, "voice");
+                
+                // Incrementar contador
+                streetsAnnounced++;
+                document.getElementById('streetsCount').textContent = streetsAnnounced;
+            }
+            
+            // Actualizar hora de última actualización
+            updateLastUpdateTime();
+        }
+        
+        function handleGeolocationError(error) {
+            let message = "Error de GPS: ";
+            
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message = "Permiso de ubicación denegado. Por favor, permite el acceso a ubicación.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = "Ubicación no disponible. Verifica tu conexión GPS.";
+                    break;
+                case error.TIMEOUT:
+                    message = "Tiempo de espera agotado. Intentando de nuevo...";
+                    break;
+                default:
+                    message = "Error desconocido del GPS.";
+            }
+            
+            updateStatus(message, false);
+            addLogEntry(message, "error");
+            
+            // Usar ubicación simulada para demo
+            useSimulatedLocation();
+        }
+        
+        function useSimulatedLocation() {
+            // Generar ubicación simulada para demo
+            const simulatedLat = 40.4168 + (Math.random() * 0.01 - 0.005);
+            const simulatedLng = -3.7038 + (Math.random() * 0.01 - 0.005);
+            
+            currentLocation = {
+                latitude: simulatedLat,
+                longitude: simulatedLng,
+                accuracy: 25,
+                speed: Math.random() * 50, // 0-50 km/h
+                timestamp: new Date()
+            };
+            
+            updateLocationUI();
+            
+            const newStreet = getStreetFromLocation(currentLocation);
+            if (newStreet !== lastStreet) {
+                lastStreet = newStreet;
+                document.getElementById('currentStreet').textContent = newStreet;
+                
+                if (voiceEnabled && gpsActive) {
+                    announceStreetChange(newStreet);
+                }
+                
+                addLogEntry(`📍 [SIMULADO] Nueva calle: ${newStreet}`, "voice");
+                streetsAnnounced++;
+                document.getElementById('streetsCount').textContent = streetsAnnounced;
+            }
+            
+            updateLastUpdateTime();
+            
+            // Si el GPS está activo, continuar simulación
+            if (gpsActive) {
+                setTimeout(useSimulatedLocation, 3000);
+            }
+        }
+        
+        // ===== SISTEMA DE VOZ =====
+        let isSpeaking = false;
+        let speechQueue = [];
+        
+        function speak(text) {
+            if (!voiceEnabled) return;
+            
+            if (isSpeaking) {
+                speechQueue.push(text);
+                return;
+            }
+            
+            isSpeaking = true;
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Configurar parámetros de voz
+            utterance.lang = 'es-ES';
+            utterance.rate = parseFloat(document.getElementById('speedSlider').value);
+            utterance.volume = parseInt(document.getElementById('volumeSlider').value) / 100;
+            utterance.pitch = 1.0;
+            
+            utterance.onend = function() {
+                isSpeaking = false;
+                if (speechQueue.length > 0) {
+                    speak(speechQueue.shift());
+                }
+            };
+            
+            utterance.onerror = function() {
+                isSpeaking = false;
+                if (speechQueue.length > 0) {
+                    speak(speechQueue.shift());
+                }
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+        
+        function announceStreetChange(streetName) {
+            const announcement = `Ahora en ${streetName}`;
+            speak(announcement);
+        }
+        
+        function testVoice() {
+            speak("Sistema de voz funcionando correctamente. GPS activo.");
+            addLogEntry("Probando sistema de voz", "system");
+        }
+        
+        function toggleVoice() {
+            voiceEnabled = !voiceEnabled;
+            const btn = document.getElementById('voiceBtn');
+            
+            if (voiceEnabled) {
+                btn.innerHTML = '<span>🔊</span> Voz: ON';
+                btn.style.background = 'linear-gradient(135deg, #26d0ce, #1a2980)';
+                addLogEntry("Voz activada", "system");
+                speak("Voz activada");
+            } else {
+                btn.innerHTML = '<span>🔇</span> Voz: OFF';
+                btn.style.background = 'linear-gradient(135deg, #666, #333)';
+                addLogEntry("Voz desactivada", "system");
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                speechQueue = [];
+            }
+        }
+        
+        function repeatAnnouncement() {
+            if (lastStreet && voiceEnabled) {
+                speak(`Repitiendo: Estás en ${lastStreet}`);
+                addLogEntry("Repitiendo anuncio de calle", "voice");
+            }
+        }
+        
+        // ===== FUNCIONES AUXILIARES =====
+        function getStreetFromLocation(location) {
+            // En una aplicación real, aquí llamarías a una API de geocodificación inversa
+            // Por ahora, usamos una simulación basada en las coordenadas
+            
+            const lat = location.latitude;
+            const lng = location.longitude;
+            
+            // Generar índice basado en coordenadas para consistencia
+            const latInt = Math.abs(Math.floor(lat * 1000));
+            const lngInt = Math.abs(Math.floor(lng * 1000));
+            const index = (latInt + lngInt) % streetNames.length;
+            
+            return streetNames[index];
+        }
+        
+        function updateLocationUI() {
+            if (!currentLocation) return;
+            
+            document.getElementById('latitude').textContent = currentLocation.latitude.toFixed(6);
+            document.getElementById('longitude').textContent = currentLocation.longitude.toFixed(6);
+            document.getElementById('accuracy').textContent = Math.round(currentLocation.accuracy) + ' metros';
+            document.getElementById('speed').textContent = (currentLocation.speed * 3.6).toFixed(1) + ' km/h';
+        }
+        
+        function updateStatus(message, isActive) {
+            document.getElementById('statusText').textContent = message;
+            const dot = document.getElementById('statusDot');
+            
+            if (isActive) {
+                dot.style.background = '#4cd137';
+                dot.classList.remove('inactive');
+            } else {
+                dot.style.background = '#e74c3c';
+                dot.classList.add('inactive');
+            }
+        }
+        
+        function updateButtonStates() {
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            
+            if (gpsActive) {
+                startBtn.disabled = true;
+                startBtn.style.opacity = '0.5';
+                stopBtn.disabled = false;
+                stopBtn.style.opacity = '1';
+            } else {
+                startBtn.disabled = false;
+                startBtn.style.opacity = '1';
+                stopBtn.disabled = true;
+                stopBtn.style.opacity = '0.5';
+            }
+        }
+        
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            document.getElementById('lastUpdate').textContent = timeString;
+        }
+        
+        function updateUI() {
+            document.getElementById('streetsCount').textContent = streetsAnnounced;
+        }
+        
+        // ===== SISTEMA DE LOG =====
+        function addLogEntry(message, type = 'info') {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            
+            const entry = {
+                time: timeString,
+                message: message,
+                type: type
+            };
+            
+            logEntries.unshift(entry);
+            
+            // Limitar a 50 entradas
+            if (logEntries.length > 50) {
+                logEntries = logEntries.slice(0, 50);
+            }
+            
+            updateLogUI();
+        }
+        
+        function updateLogUI() {
+            const container = document.getElementById('logEntries');
+            const countElement = document.getElementById('logCount');
+            
+            container.innerHTML = '';
+            countElement.textContent = logEntries.length + ' eventos';
+            
+            logEntries.forEach(entry => {
+                const div = document.createElement('div');
+                div.className = `log-entry ${entry.type}`;
+                div.innerHTML = `
+                    <div class="log-time">${entry.time}</div>
+                    <div class="log-message">${entry.message}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function clearLog() {
+            logEntries = [];
+            updateLogUI();
+            addLogEntry("Historial limpiado", "system");
+        }
+        
+        // ===== ATRIBUTOS DE TECLADO =====
+        document.addEventListener('keydown', function(e) {
+            // Espacio para repetir anuncio
+            if (e.code === 'Space' && !e.target.matches('input, button, textarea')) {
+                e.preventDefault();
+                repeatAnnouncement();
+            }
+            
+            // G para iniciar/detener GPS
+            if (e.code === 'KeyG' && e.ctrlKey) {
+                e.preventDefault();
+                if (gpsActive) {
+                    stopGPS();
+                } else {
+                    startGPS();
+                }
+            }
+            
+            // V para activar/desactivar voz
+            if (e.code === 'KeyV' && e.ctrlKey) {
+                e.preventDefault();
+                toggleVoice();
+            }
+            
+            // L para limpiar log
+            if (e.code === 'KeyL' && e.ctrlKey) {
+                e.preventDefault();
+                clearLog();
+            }
+        });
+        
+        // ===== INICIALIZAR CON UN MENSAJE =====
+        setTimeout(() => {
+            addLogEntry("Presiona 'Iniciar GPS' para comenzar", "system");
+            addLogEntry("Usa Ctrl+G para iniciar/detener GPS", "system");
+            addLogEntry("Usa Ctrl+V para activar/desactivar voz", "system");
+        }, 500);
+    </script>
+</body>
+</html>
