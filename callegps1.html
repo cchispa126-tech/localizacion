@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Localizador GPS y Dirección</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a237e, #4a148c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        h1 i {
+            color: #4fc3f7;
+        }
+        
+        .subtitle {
+            color: #bbbbbb;
+            font-size: 0.9rem;
+        }
+        
+        .status-card {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        #status {
+            font-size: 1rem;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .info-card {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-content {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 60px;
+            word-break: break-word;
+        }
+        
+        .coordinates {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .coordinate-item {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .coordinate-label {
+            font-size: 0.9rem;
+            color: #bbbbbb;
+            margin-bottom: 5px;
+        }
+        
+        .coordinate-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .buttons-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .buttons-row button {
+            flex: 1;
+        }
+        
+        button {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        #getLocationBtn {
+            background: linear-gradient(to right, #4fc3f7, #2979ff);
+            color: white;
+        }
+        
+        #getLocationBtn:hover {
+            background: linear-gradient(to right, #29b6f6, #1565c0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 182, 246, 0.4);
+        }
+        
+        #speakBtn {
+            background: linear-gradient(to right, #ff6b6b, #ff8e53);
+            color: white;
+        }
+        
+        #speakBtn:hover {
+            background: linear-gradient(to right, #ff5252, #ff7b39);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        #stopSpeechBtn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #stopSpeechBtn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        #resetBtn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #resetBtn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #4fc3f7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            color: #ff8a80;
+            background-color: rgba(255, 138, 128, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .success {
+            color: #69f0ae;
+            background-color: rgba(105, 240, 174, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .accuracy {
+            font-size: 0.9rem;
+            color: #bbbbbb;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .voice-controls {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .voice-btn {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            background-color: rgba(79, 195, 247, 0.2);
+            border: 1px solid rgba(79, 195, 247, 0.4);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .voice-btn:hover {
+            background-color: rgba(79, 195, 247, 0.4);
+        }
+        
+        .auto-speak-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4fc3f7;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #bbbbbb;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .coordinates {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-map-marker-alt"></i> Localizador GPS con Voz</h1>
+        <p class="subtitle">Obtén y escucha automáticamente tu calle actual</p>
+    </header>
+    
+    <div class="container">
+        <div class="status-card">
+            <div class="status-title">
+                <i class="fas fa-satellite"></i> Estado de localización
+            </div>
+            <div id="status">
+                Esperando para obtener ubicación...
+            </div>
+            <div class="voice-controls">
+                <button id="speakBtn" class="voice-btn">
+                    <i class="fas fa-volume-up"></i> Decir Calle Ahora
+                </button>
+                <button id="stopSpeechBtn" class="voice-btn">
+                    <i class="fas fa-stop"></i> Detener Voz
+                </button>
+            </div>
+            <div class="auto-speak-toggle">
+                <span>Voz automática:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="autoSpeakToggle" checked>
+                    <span class="slider"></span>
+                </label>
+                <span id="autoSpeakStatus">Activada</span>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Obteniendo ubicación...</p>
+        </div>
+        
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+        
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-map-pin"></i> Coordenadas GPS
+            </div>
+            <div class="coordinates">
+                <div class="coordinate-item">
+                    <div class="coordinate-label">Latitud</div>
+                    <div class="coordinate-value" id="latitude">--</div>
+                </div>
+                <div class="coordinate-item">
+                    <div class="coordinate-label">Longitud</div>
+                    <div class="coordinate-value" id="longitude">--</div>
+                </div>
+            </div>
+            <div id="accuracy" class="accuracy"></div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-road"></i> Dirección Completa
+            </div>
+            <div class="info-content" id="address">
+                La dirección aparecerá aquí después de obtener la ubicación.
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-street-view"></i> Calle Actual
+            </div>
+            <div class="info-content" id="street">
+                La calle aparecerá aquí después de obtener la ubicación.
+            </div>
+        </div>
+        
+        <div class="button-container">
+            <div class="buttons-row">
+                <button id="getLocationBtn">
+                    <i class="fas fa-location-crosshairs"></i> Obtener Ubicación
+                </button>
+                <button id="resetBtn">
+                    <i class="fas fa-redo"></i> Reiniciar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Esta aplicación utiliza la API de Geolocalización y OpenStreetMap para obtener direcciones.</p>
+        <p>La voz se activa automáticamente al obtener la ubicación</p>
+        <p>© 2023 Localizador GPS - Para uso educativo</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos del DOM
+            const statusElement = document.getElementById('status');
+            const latitudeElement = document.getElementById('latitude');
+            const longitudeElement = document.getElementById('longitude');
+            const addressElement = document.getElementById('address');
+            const streetElement = document.getElementById('street');
+            const getLocationBtn = document.getElementById('getLocationBtn');
+            const speakBtn = document.getElementById('speakBtn');
+            const stopSpeechBtn = document.getElementById('stopSpeechBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const loadingElement = document.getElementById('loading');
+            const errorElement = document.getElementById('error');
+            const successElement = document.getElementById('success');
+            const accuracyElement = document.getElementById('accuracy');
+            const autoSpeakToggle = document.getElementById('autoSpeakToggle');
+            const autoSpeakStatus = document.getElementById('autoSpeakStatus');
+            
+            // Variables para almacenar la ubicación
+            let currentPosition = null;
+            let watchId = null;
+            let isSpeaking = false;
+            let speechSynthesis = window.speechSynthesis;
+            let currentStreet = "";
+            let autoSpeakEnabled = true;
+            
+            // Event listeners
+            getLocationBtn.addEventListener('click', getLocation);
+            speakBtn.addEventListener('click', speakStreet);
+            stopSpeechBtn.addEventListener('click', stopSpeech);
+            resetBtn.addEventListener('click', resetLocation);
+            autoSpeakToggle.addEventListener('change', toggleAutoSpeak);
+            
+            // Función para obtener la ubicación
+            function getLocation() {
+                // Mostrar estado de carga
+                loadingElement.style.display = 'block';
+                errorElement.style.display = 'none';
+                successElement.style.display = 'none';
+                statusElement.textContent = 'Obteniendo ubicación...';
+                
+                // Verificar si el navegador soporta geolocalización
+                if (!navigator.geolocation) {
+                    showError("Tu navegador no soporta la geolocalización.");
+                    loadingElement.style.display = 'none';
+                    return;
+                }
+                
+                // Opciones para la geolocalización
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                };
+                
+                // Intentar obtener la ubicación actual
+                navigator.geolocation.getCurrentPosition(
+                    // Éxito
+                    function(position) {
+                        loadingElement.style.display = 'none';
+                        currentPosition = position;
+                        updatePositionInfo(position);
+                        getAddressFromCoordinates(position.coords.latitude, position.coords.longitude);
+                        showSuccess("Ubicación obtenida correctamente.");
+                        
+                        // Iniciar seguimiento de posición
+                        if (watchId) {
+                            navigator.geolocation.clearWatch(watchId);
+                        }
+                        
+                        watchId = navigator.geolocation.watchPosition(
+                            updatePositionInfo,
+                            showError,
+                            options
+                        );
+                    },
+                    // Error
+                    function(error) {
+                        loadingElement.style.display = 'none';
+                        let errorMessage = "Error al obtener la ubicación: ";
+                        
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage += "Permiso denegado. Por favor, permite el acceso a la ubicación en tu navegador.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage += "La información de ubicación no está disponible.";
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage += "La solicitud de ubicación ha expirado.";
+                                break;
+                            default:
+                                errorMessage += "Error desconocido.";
+                        }
+                        
+                        showError(errorMessage);
+                    },
+                    options
+                );
+            }
+            
+            // Función para actualizar la información de posición
+            function updatePositionInfo(position) {
+                const coords = position.coords;
+                
+                // Actualizar coordenadas
+                latitudeElement.textContent = coords.latitude.toFixed(6);
+                longitudeElement.textContent = coords.longitude.toFixed(6);
+                
+                // Actualizar precisión
+                accuracyElement.textContent = `Precisión: ${coords.accuracy ? Math.round(coords.accuracy) : 'N/A'} metros`;
+                
+                // Actualizar estado
+                statusElement.textContent = 'Ubicación obtenida correctamente';
+                statusElement.style.color = '#69f0ae';
+                
+                // Actualizar posición actual
+                currentPosition = position;
+            }
+            
+            // Función para obtener dirección a partir de coordenadas
+            async function getAddressFromCoordinates(lat, lon) {
+                try {
+                    addressElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo dirección...';
+                    streetElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Identificando calle...';
+                    
+                    // Usar Nominatim (OpenStreetMap) para geocodificación inversa
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
+                    );
+                    
+                    if (!response.ok) {
+                        throw new Error('Error al obtener la dirección');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data && data.address) {
+                        // Mostrar dirección completa
+                        let fullAddress = data.display_name || "Dirección no disponible";
+                        if (fullAddress.length > 200) {
+                            fullAddress = fullAddress.substring(0, 200) + '...';
+                        }
+                        addressElement.textContent = fullAddress;
+                        
+                        // Extraer solo la calle del objeto address
+                        extractStreetFromAddress(data.address);
+                        
+                        // Hablar automáticamente si está activado
+                        if (autoSpeakEnabled && currentStreet && !currentStreet.includes("Calle no identificada")) {
+                            setTimeout(() => {
+                                speakStreet();
+                            }, 500); // Pequeño retraso para mejor experiencia
+                        }
+                    } else {
+                        addressElement.textContent = "Dirección no disponible";
+                        streetElement.textContent = "Calle no identificada";
+                    }
+                } catch (error) {
+                    console.error("Error al obtener dirección:", error);
+                    addressElement.textContent = "No se pudo obtener la dirección. Verifica tu conexión a internet.";
+                    streetElement.textContent = "Calle no disponible";
+                }
+            }
+            
+            // Función para extraer solo la calle del objeto address
+            function extractStreetFromAddress(addressObj) {
+                // Prioridad para obtener el nombre de la calle
+                // OpenStreetMap usa diferentes campos según el país
+                let streetName = "";
+                
+                if (addressObj.road) {
+                    streetName = addressObj.road;
+                } else if (addressObj.street) {
+                    streetName = addressObj.street;
+                } else if (addressObj.pedestrian) {
+                    streetName = addressObj.pedestrian;
+                } else if (addressObj.footway) {
+                    streetName = addressObj.footway;
+                } else if (addressObj.residential) {
+                    streetName = addressObj.residential;
+                } else if (addressObj.path) {
+                    streetName = addressObj.path;
+                } else if (addressObj.cycleway) {
+                    streetName = addressObj.cycleway;
+                } else {
+                    // Si no hay calle específica, usar el primer elemento disponible
+                    if (addressObj.village) {
+                        streetName = "Calle sin nombre identificada cerca de " + addressObj.village;
+                    } else if (addressObj.town) {
+                        streetName = "Calle sin nombre identificada cerca de " + addressObj.town;
+                    } else if (addressObj.city) {
+                        streetName = "Calle sin nombre identificada cerca de " + addressObj.city;
+                    } else {
+                        streetName = "Calle no identificada en esta ubicación";
+                    }
+                }
+                
+                // Guardar la calle para uso en la función de voz
+                currentStreet = streetName;
+                
+                // Mostrar la calle en el elemento correspondiente
+                streetElement.textContent = streetName;
+            }
+            
+            // Función para decir SOLO la calle
+            function speakStreet() {
+                if (isSpeaking) {
+                    stopSpeech();
+                    return;
+                }
+                
+                if (!currentPosition || !currentStreet) {
+                    if (!currentPosition) {
+                        speakText("Primero obtén tu ubicación haciendo clic en el botón Obtener Ubicación.");
+                    } else if (!currentStreet || currentStreet === "Calle no identificada en esta ubicación") {
+                        speakText("No se pudo identificar la calle en esta ubicación.");
+                    }
+                    return;
+                }
+                
+                // Crear el texto de voz SOLO con la calle
+                let speechText = "";
+                
+                if (currentStreet.startsWith("Calle sin nombre")) {
+                    speechText = currentStreet;
+                } else {
+                    speechText = `Estás en la calle ${currentStreet}`;
+                }
+                
+                speakText(speechText);
+                
+                // Cambiar el botón mientras habla
+                speakBtn.innerHTML = '<i class="fas fa-stop"></i> Detener';
+                isSpeaking = true;
+            }
+            
+            // Función para hablar texto
+            function speakText(text) {
+                if ('speechSynthesis' in window) {
+                    // Detener cualquier habla en curso
+                    speechSynthesis.cancel();
+                    
+                    // Crear el utterance
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    // Configurar voz en español si está disponible
+                    utterance.lang = 'es-ES';
+                    utterance.rate = 0.9; // Velocidad ligeramente reducida
+                    utterance.pitch = 1; // Tono normal
+                    utterance.volume = 1; // Volumen máximo
+                    
+                    // Intentar encontrar una voz en español
+                    const voices = speechSynthesis.getVoices();
+                    const spanishVoice = voices.find(voice => 
+                        voice.lang.startsWith('es')
+                    );
+                    
+                    if (spanishVoice) {
+                        utterance.voice = spanishVoice;
+                    }
+                    
+                    // Evento cuando termina de hablar
+                    utterance.onend = function() {
+                        speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> Decir Calle Ahora';
+                        isSpeaking = false;
+                    };
+                    
+                    // Evento en caso de error
+                    utterance.onerror = function(event) {
+                        console.error('Error en speech synthesis:', event);
+                        speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> Decir Calle Ahora';
+                        isSpeaking = false;
+                    };
+                    
+                    // Iniciar el habla
+                    speechSynthesis.speak(utterance);
+                }
+            }
+            
+            // Función para detener el habla
+            function stopSpeech() {
+                if (speechSynthesis.speaking) {
+                    speechSynthesis.cancel();
+                    speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> Decir Calle Ahora';
+                    isSpeaking = false;
+                }
+            }
+            
+            // Función para activar/desactivar voz automática
+            function toggleAutoSpeak() {
+                autoSpeakEnabled = autoSpeakToggle.checked;
+                autoSpeakStatus.textContent = autoSpeakEnabled ? "Activada" : "Desactivada";
+                
+                // Guardar preferencia en localStorage
+                localStorage.setItem('autoSpeakEnabled', autoSpeakEnabled);
+                
+                // Mensaje de confirmación
+                if (autoSpeakEnabled) {
+                    showSuccess("Voz automática activada. La próxima ubicación se anunciará con voz.");
+                } else {
+                    showSuccess("Voz automática desactivada.");
+                }
+            }
+            
+            // Función para mostrar errores
+            function showError(message) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                statusElement.textContent = 'Error al obtener ubicación';
+                statusElement.style.color = '#ff8a80';
+                
+                // Hablar el error si la voz automática está activada
+                if (autoSpeakEnabled && message.includes("Permiso denegado")) {
+                    setTimeout(() => {
+                        speakText("Permiso denegado para acceder a la ubicación. Por favor, permite el acceso en la configuración de tu navegador.");
+                    }, 500);
+                }
+            }
+            
+            // Función para mostrar éxito
+            function showSuccess(message) {
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+                
+                // Ocultar después de 3 segundos
+                setTimeout(() => {
+                    successElement.style.display = 'none';
+                }, 3000);
+            }
+            
+            // Función para reiniciar la ubicación
+            function resetLocation() {
+                // Detener cualquier habla en curso
+                stopSpeech();
+                
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                }
+                
+                currentPosition = null;
+                currentStreet = "";
+                latitudeElement.textContent = '--';
+                longitudeElement.textContent = '--';
+                addressElement.textContent = 'La dirección aparecerá aquí después de obtener la ubicación.';
+                streetElement.textContent = 'La calle aparecerá aquí después de obtener la ubicación.';
+                statusElement.textContent = 'Esperando para obtener ubicación...';
+                statusElement.style.color = '#ffffff';
+                errorElement.style.display = 'none';
+                successElement.style.display = 'none';
+                accuracyElement.textContent = '';
+                loadingElement.style.display = 'none';
+                speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> Decir Calle Ahora';
+                isSpeaking = false;
+            }
+            
+            // Cargar preferencias guardadas
+            function loadPreferences() {
+                const savedAutoSpeak = localStorage.getItem('autoSpeakEnabled');
+                if (savedAutoSpeak !== null) {
+                    autoSpeakEnabled = savedAutoSpeak === 'true';
+                    autoSpeakToggle.checked = autoSpeakEnabled;
+                    autoSpeakStatus.textContent = autoSpeakEnabled ? "Activada" : "Desactivada";
+                }
+            }
+            
+            // Inicializar la aplicación
+            function initApp() {
+                loadPreferences();
+                // Intento automático de obtener ubicación al cargar la página
+                getLocation();
+            }
+            
+            // Cargar voces disponibles al inicio
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = function() {
+                    console.log("Voces cargadas:", speechSynthesis.getVoices().length);
+                };
+            }
+            
+            // Iniciar la aplicación
+            initApp();
+        });
+    </script>
+</body>
+</html>
